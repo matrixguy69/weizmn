@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEVEL UP // Protocol</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/effects.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+
+  <!-- Visual Effects -->
+  <div class="noise"></div>
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+  <canvas id="particles"></canvas>
+
+  <!-- Ghost Text -->
+  <span class="ghost" style="font-size:clamp(100px,15vw,220px);top:15%;left:-2%">LEVEL</span>
+  <span class="ghost" style="font-size:clamp(80px,12vw,180px);top:55%;right:-3%">UP</span>
+  <span class="ghost" style="font-size:clamp(60px,10vw,140px);bottom:10%;left:10%">BONE</span>
+
+  <!-- App Shell -->
+  <div class="app">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/logo-weizmann.png" alt="WeizMann" class="sidebar-logo">
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="group-label">Core</div>
+        <div class="nav-item active" data-view="dashboard">
+          <span class="icon" data-icon="dashboard"></span>Dashboard
+        </div>
+        <div class="nav-item" data-view="quests">
+          <span class="icon" data-icon="quest"></span>Daily Quests
+          <span class="badge" id="questBadge">0</span>
+        </div>
+        <div class="nav-item" data-view="habits">
+          <span class="icon" data-icon="habit"></span>Habits
+          <span class="badge" id="habitBadge">0</span>
+        </div>
+        <div class="nav-item" data-view="timer">
+          <span class="icon" data-icon="timer"></span>Focus Timer
+        </div>
+
+        <div class="group-label">Progress</div>
+        <div class="nav-item" data-view="achievements">
+          <span class="icon" data-icon="achievement"></span>Achievements
+        </div>
+        <div class="nav-item" data-view="shop">
+          <span class="icon" data-icon="shop"></span>Reward Shop
+        </div>
+
+        <div class="group-label">System</div>
+        <div class="nav-item" data-view="settings">
+          <span class="icon" data-icon="settings"></span>Settings
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-xp">XP <span id="sidebarXp">0</span> / <span id="sidebarXpMax">500</span></div>
+        <div class="user-bar" style="--xp:0%"></div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="section active" id="view-dashboard">
+        <div class="main-header">
+          <div>
+            <h1>Dashboard</h1>
+            <div class="subtitle">// Subject Scan &mdash; ID_0001</div>
+          </div>
+          <div class="header-actions">
+            <button class="btn accent sm" onclick="UI.switchView('quests')">+ New Quest</button>
+          </div>
+        </div>
+
+        <!-- Hero Grid: Figure + Readout -->
+        <div class="grid-2 reveal">
+          <div class="dash-figure" id="figurePanel">
+            <img src="assets/hero-vitruvian.jpg" alt="X-Ray Scan">
+            <div class="sweep" id="sweep"></div>
+            <div class="stat-tag t1">Cognition <span class="lv" id="tagCog">LV.1</span></div>
+            <div class="stat-tag t2">Posture <span class="lv" id="tagPos">LV.1</span></div>
+            <div class="stat-tag t3">Core <span class="lv" id="tagCor">LV.1</span></div>
+            <div class="stat-tag t4">Mobility <span class="lv" id="tagMob">LV.1</span></div>
+          </div>
+
+          <div class="dash-readout">
+            <div class="row">
+              <div class="name">Cognition</div>
+              <div class="meta">
+                <div class="bar"><div class="bar-fill" id="pctCog" style="--pct:10%"></div></div>
+                <div class="lv" id="lvCog">LV.1</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="name">Posture</div>
+              <div class="meta">
+                <div class="bar"><div class="bar-fill" id="pctPos" style="--pct:10%"></div></div>
+                <div class="lv" id="lvPos">LV.1</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="name">Cardio</div>
+              <div class="meta">
+                <div class="bar"><div class="bar-fill" id="pctCar" style="--pct:10%"></div></div>
+                <div class="lv" id="lvCar">LV.1</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="name">Core</div>
+              <div class="meta">
+                <div class="bar"><div class="bar-fill" id="pctCor" style="--pct:10%"></div></div>
+                <div class="lv" id="lvCor">LV.1</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="name">Mobility</div>
+              <div class="meta">
+                <div class="bar"><div class="bar-fill" id="pctMob" style="--pct:10%"></div></div>
+                <div class="lv" id="lvMob">LV.1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="metrics reveal">
+          <div class="metric">
+            <div class="lbl">Total Level</div>
+            <div class="val" id="totalLevel">1</div>
+          </div>
+          <div class="metric">
+            <div class="lbl">Gold</div>
+            <div class="val" style="color:var(--gold)" id="totalGold">0</div>
+          </div>
+          <div class="metric">
+            <div class="lbl">Streak</div>
+            <div class="val" id="totalStreak">0D</div>
+          </div>
+          <div class="metric">
+            <div class="lbl">XP Today</div>
+            <div class="val" style="color:var(--xp-green)" id="xpToday">0</div>
+          </div>
+          <div class="metric">
+            <div class="lbl">Quests Done</div>
+            <div class="val" id="questsDone">0</div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card reveal" style="margin-top:1px">
+          <div class="card-header">
+            <h3>Recent Activity</h3>
+          </div>
+          <div class="card-body" id="recentActivity"></div>
+        </div>
+      </section>
+
+      <!-- ===== QUESTS ===== -->
+      <section class="section" id="view-quests">
+        <div class="main-header">
+          <div>
+            <h1>Daily Quests</h1>
+            <div class="subtitle">// Tasks that reset daily. Earn XP and gold.</div>
+          </div>
+          <div class="header-actions">
+            <button class="btn sm" onclick="Quests.resetDaily()">Reset Daily</button>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="input-group">
+            <input type="text" class="input" id="questInput" placeholder="New quest...">
+            <select class="select" id="questDiff">
+              <option value="easy">Easy (15 XP)</option>
+              <option value="medium" selected>Medium (30 XP)</option>
+              <option value="hard">Hard (60 XP)</option>
+            </select>
+            <button class="btn accent sm" onclick="Quests.add()">Add</button>
+          </div>
+          <div id="questList"></div>
+        </div>
+      </section>
+
+      <!-- ===== HABITS ===== -->
+      <section class="section" id="view-habits">
+        <div class="main-header">
+          <div>
+            <h1>Habits</h1>
+            <div class="subtitle">// Build consistency. Earn streaks. Level up stats.</div>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="input-group">
+            <input type="text" class="input" id="habitInput" placeholder="New habit...">
+            <select class="select" id="habitCat">
+              <option value="cognition">Cognition</option>
+              <option value="posture">Posture</option>
+              <option value="cardio">Cardio</option>
+              <option value="core">Core</option>
+              <option value="mobility">Mobility</option>
+            </select>
+            <button class="btn accent sm" onclick="Habits.add()">Add</button>
+          </div>
+          <div id="habitList"></div>
+        </div>
+      </section>
+
+      <!-- ===== FOCUS TIMER ===== -->
+      <section class="section" id="view-timer">
+        <div class="main-header">
+          <div>
+            <h1>Focus Timer</h1>
+            <div class="subtitle">// Earn XP for staying focused. Pomodoro technique.</div>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="timer-modes">
+            <button class="timer-mode active" onclick="Timer.setMode(25,this)">Pomodoro (25m)</button>
+            <button class="timer-mode" onclick="Timer.setMode(15,this)">Short (15m)</button>
+            <button class="timer-mode" onclick="Timer.setMode(50,this)">Deep (50m)</button>
+            <button class="timer-mode" onclick="Timer.setMode(5,this)">Micro (5m)</button>
+          </div>
+
+          <div class="timer-display">
+            <!-- Circle Progress -->
+            <div class="timer-progress">
+              <svg viewBox="0 0 200 200">
+                <circle class="track" cx="100" cy="100" r="90"></circle>
+                <circle class="fill" id="timerCircle" cx="100" cy="100" r="90"
+                  stroke-dasharray="565.48"
+                  stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="center-text">
+                <div class="timer-time" id="timerDisplay">25:00</div>
+                <div class="timer-label" id="timerLabel">Ready to focus</div>
+              </div>
+            </div>
+
+            <div class="timer-controls">
+              <button class="btn solid" id="timerStartBtn" onclick="Timer.toggle()">Start</button>
+              <button class="btn" onclick="Timer.reset()">Reset</button>
+            </div>
+            <div class="timer-xp" id="timerXpReward">+50 XP earned!</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ACHIEVEMENTS ===== -->
+      <section class="section" id="view-achievements">
+        <div class="main-header">
+          <div>
+            <h1>Achievements</h1>
+            <div class="subtitle">// Milestones unlocked through progress</div>
+          </div>
+          <div class="header-actions">
+            <span style="font-family:var(--level);font-size:12px;color:var(--accent)" id="badgeCount">0 / 18</span>
+          </div>
+        </div>
+        <div class="badge-grid reveal" id="badgeGrid"></div>
+      </section>
+
+      <!-- ===== SHOP ===== -->
+      <section class="section" id="view-shop">
+        <div class="main-header">
+          <div>
+            <h1>Reward Shop</h1>
+            <div class="subtitle">// Spend gold on upgrades and boosts</div>
+          </div>
+          <div class="header-actions">
+            <span style="font-family:var(--level);font-size:14px;color:var(--gold)" id="shopGold">0 Gold</span>
+          </div>
+        </div>
+        <div class="card reveal" id="shopList"></div>
+      </section>
+
+      <!-- ===== SETTINGS ===== -->
+      <section class="section" id="view-settings">
+        <div class="main-header">
+          <div>
+            <h1>Settings</h1>
+            <div class="subtitle">// Configure your protocol</div>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-header"><h3>Profile</h3></div>
+          <div class="card-body">
+            <div class="settings-group">
+              <div class="settings-label">Subject Name</div>
+              <input type="text" class="input" id="settingsName" value="Agent_001"
+                style="width:100%;max-width:300px"
+                onchange="state.set('name',this.value);UI.toast('&#9998;','Name updated')">
+            </div>
+            <div class="settings-group">
+              <div class="settings-label">Stats Overview</div>
+              <div id="settingsStats" style="font-family:var(--mono);font-size:11px;color:var(--ink-dim);line-height:2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card reveal" style="margin-top:1px">
+          <div class="card-header"><h3>Data</h3></div>
+          <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn sm" onclick="exportData()">Export Data</button>
+            <button class="btn danger sm" onclick="if(confirm('Reset ALL progress? This cannot be undone.')){localStorage.clear();location.reload()}">Reset All Progress</button>
+          </div>
+        </div>
+
+        <div class="card reveal" style="margin-top:1px">
+          <div class="card-header"><h3>Keyboard Shortcuts</h3></div>
+          <div class="card-body" style="font-family:var(--mono);font-size:11px;color:var(--ink-dim);line-height:2">
+            <div><span style="color:var(--accent)">Ctrl+1</span> &mdash; Dashboard</div>
+            <div><span style="color:var(--accent)">Ctrl+2</span> &mdash; Quests</div>
+            <div><span style="color:var(--accent)">Ctrl+3</span> &mdash; Habits</div>
+            <div><span style="color:var(--accent)">Ctrl+4</span> &mdash; Timer</div>
+            <div><span style="color:var(--accent)">Ctrl+5</span> &mdash; Achievements</div>
+            <div><span style="color:var(--accent)">Ctrl+6</span> &mdash; Shop</div>
+            <div><span style="color:var(--accent)">Esc</span> &mdash; Close modal</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== MOBILE NAV ===== -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav-item active" data-view="dashboard">
+      <span class="icon" data-icon="dashboard"></span>Home
+    </button>
+    <button class="mobile-nav-item" data-view="quests">
+      <span class="icon" data-icon="quest"></span>Quests
+    </button>
+    <button class="mobile-nav-item" data-view="habits">
+      <span class="icon" data-icon="habit"></span>Habits
+    </button>
+    <button class="mobile-nav-item" data-view="timer">
+      <span class="icon" data-icon="timer"></span>Timer
+    </button>
+    <button class="mobile-nav-item" data-view="shop">
+      <span class="icon" data-icon="shop"></span>Shop
+    </button>
+  </nav>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="close-btn" onclick="UI.closeModal()">&times;</button>
+      <h3 id="modalTitle">Level Up!</h3>
+      <div class="sub" id="modalSub"></div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast">
+    <span class="toast-icon"></span>
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- JS Modules -->
+  <script src="js/icons.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/quests.js"></script>
+  <script src="js/habits.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/reveals.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
