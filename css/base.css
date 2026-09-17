@@ -1,0 +1,49 @@
+/* ============================================
+   LEVEL UP PROTOCOL — Reset & Base
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--bg);
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--sans);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    linear-gradient(rgba(5,5,5,0.3), rgba(5,5,5,0.3)),
+    url("../assets/bg-lowexposure.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+input, select { font-family: inherit; }
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); }
+::-webkit-scrollbar-thumb:hover { background: var(--line-strong); }
